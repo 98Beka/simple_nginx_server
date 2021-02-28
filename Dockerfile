@@ -1,15 +1,15 @@
 FROM  alpine:latest
 
-RUN apk update && apk upgrade
-RUN apk add nginx openrc
+RUN apk update && apk upgrade && apk add nginx openrc;
 
 #nginx
-RUN rm /etc/nginx/http.d/default.conf
-COPY srcs/nginx.conf /etc/nginx/http.d/default.conf
-
-COPY ./srcs/start.sh ./start.sh
-RUN chmod +x start.sh
-
+RUN mkdir /run/nginx; 
+RUN rm /etc/nginx/http.d/default.conf;
+RUN echo -e "server {       \n\
+    listen      80;         \n\
+    listen      [::]:80;    \n\
+    server_name localhost;  \n\
+}" > /etc/nginx/http.d/default.conf;
+RUN openrc; touch /run/openrc/softlevel;
 EXPOSE 80
-
-CMD /start.sh
+ENTRYPOINT   rc-service nginx start; sh;
