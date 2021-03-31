@@ -1,15 +1,20 @@
 FROM  alpine:latest
 
-RUN apk update && apk upgrade && apk add nginx openrc;
+RUN apk update && apk upgrade && apk add nginx
+RUN mkdir /run/nginx
+VOLUME ["/sys/fs/cgroup"]
+COPY nginx.conf /etc/nginx/nginx.conf
 
-#nginx
-RUN mkdir /run/nginx; 
-RUN rm /etc/nginx/http.d/default.conf;
-RUN echo -e "server {       \n\
-    listen      80;         \n\
-    listen      [::]:80;    \n\
-    server_name localhost;  \n\
-}" > /etc/nginx/http.d/default.conf;
-RUN openrc; touch /run/openrc/softlevel;
+RUN echo -e "<!DOCTYPE html>                 \n\
+<html lang=\"en\">                           \n\
+<head>                                       \n\
+    <meta charset=\"utf-8\" />               \n\
+    <title>HTML5</title>                     \n\
+</head>                                      \n\
+<body>                                       \n\
+    hello!                                  \n\
+</body>                                      \n\
+</html>" > var/www/index.html
+
 EXPOSE 80
-ENTRYPOINT   rc-service nginx start; sh;
+ENTRYPOINT nginx -g 'daemon off;'
